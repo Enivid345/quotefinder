@@ -143,7 +143,7 @@
     let resultsPresent = false;
     let contChecking = false;
     let SYS_URL = "https://api.datamuse.com/words?rel_syn=";
-    let API_URL = "https://cors-anywhere.herokuapp.com/https://zenquotes.io/api/quotes?filter=";
+    let API_URL = "https://corsproxy.io/?https://zenquotes.io/api/quotes?filter=";
     let quoteContainer = document.getElementById("quoteContainer");
     let keywordInput = document.getElementById("keywordInput");
     function fetchSys() {
@@ -176,13 +176,7 @@
       finalSys = sysArray;
       let sysLength = finalSys.length;
           quoteContainer.innerHTML = "";
-      await fetch(API_URL + keywordInput.value, {
-  method: "GET",
-  headers: {
-    "Origin": websiteLink, // Adjust the Origin header based on your site’s URL
-    "X-Requested-With": "XMLHttpRequest" // This header can also be added
-  }
-})
+      await fetch(API_URL + keywordInput.value)
         .then((response) => response.json())
         .then((data) => {
 
