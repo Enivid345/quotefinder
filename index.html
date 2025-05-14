@@ -96,6 +96,7 @@
         margin-bottom: 10px;
         border-left: 4px solid #000;
         border-radius: 8px;
+
         color: #333;
         max-height: 80px;
         overflow: hidden;
@@ -253,8 +254,10 @@
         quoteContainer.insertAdjacentHTML("beforeend", quoteERROR);
       }
       if (contChecking) {
-        setTimeout(500);
+         setTimeout(() => {
         continueChecking;
+            
+          }, 500);
       }
     }
   </script>
