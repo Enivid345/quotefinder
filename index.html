@@ -16,14 +16,13 @@
       align-items: center;
       height: 100vh;
       color: #000;
+      overflow: hidden;
     }
 
     .container {
       background-color: #f5f5f5;
-      width: 100%;
-      max-width: 420px;
-      height: 100%;
-      max-height: 620px;
+      width: 420px;
+      height: 620px;
       box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.1);
       border-radius: 20px;
       overflow: hidden;
@@ -31,6 +30,8 @@
       flex-direction: column;
       padding: 20px;
       box-sizing: border-box;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .header {
@@ -92,9 +93,11 @@
       margin-bottom: 10px;
       border-left: 4px solid #000;
       border-radius: 8px;
-      opacity: 0;
-      animation: fadeInQuote 0.5s forwards;
       color: #333;
+      max-height: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     @keyframes fadeInQuote {
