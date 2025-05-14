@@ -154,7 +154,7 @@
         `;
       quoteContainer.innerHTML = "";
       quoteContainer.insertAdjacentHTML("beforeend", loadHTML);
-      delay(20000)
+      delay(7000)
       fetch(SYS_URL + keywordInput.value)
         .then((response) => response.json())
         .then((data) => fetchQuotes(data))
