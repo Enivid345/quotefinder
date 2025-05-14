@@ -154,6 +154,7 @@
         `;
       quoteContainer.innerHTML = "";
       quoteContainer.insertAdjacentHTML("beforeend", loadHTML);
+      delay(20000)
       fetch(SYS_URL + keywordInput.value)
         .then((response) => response.json())
         .then((data) => fetchQuotes(data))
@@ -201,7 +202,6 @@
           console.log("Error fetching quotes ");
         });
         contChecking = true;
-      continueChecking();
 
       
       contChecking = false;
@@ -223,28 +223,9 @@
           quoteContainer.insertAdjacentHTML("beforeend", quoteHTML);
         }
       }
-    function continueChecking() {
-      if (resultsPresent == false) {
-        quoteERROR = `
-        <div class="quote">
-        <p>NO QUOTES FOUND</p>
-      </div>
-        `;
-        quoteContainer.innerHTML = "";
-        quoteContainer.insertAdjacentHTML("beforeend", quoteERROR);
-      }
-      if (contChecking) {
-         setTimeout(() => {
-        continueChecking;
-            
-          }, 500);
-      }
-    }
+    
     function delay(ms) {
   setTimeout("", ms); // ms is the time delay in milliseconds
 }
-
-// Example: Delay the function for 3 seconds (3000 milliseconds)
-delay(3000);
   </script>
 </html>
