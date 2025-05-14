@@ -2,8 +2,12 @@
 <html>
   <head>
     <title>Quote Finder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       body {
         font-family: "Poppins", sans-serif;
@@ -20,9 +24,8 @@
 
       .container {
         background-color: #f5f5f5;
-        width: 95%;
-        max-width: 420px;
-        height: 90%;
+        width: 420px;
+        height: 620px;
         box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.1);
         border-radius: 20px;
         overflow: hidden;
@@ -30,11 +33,13 @@
         flex-direction: column;
         padding: 20px;
         box-sizing: border-box;
+        max-width: 100%;
+        max-height: 100%;
       }
 
       .header {
         text-align: center;
-        font-size: 24px;
+        font-size: 26px;
         font-weight: 600;
         margin-bottom: 20px;
       }
@@ -53,6 +58,12 @@
         border-radius: 8px;
         color: #000;
         outline: none;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .input-group input:focus {
+        background-color: #eaeaea;
+        transform: scale(1.03);
       }
 
       .input-group button {
@@ -62,6 +73,12 @@
         border-radius: 8px;
         color: #fff;
         cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .input-group button:hover {
+        background-color: #333;
+        transform: scale(1.03);
       }
 
       #quoteContainer {
@@ -74,16 +91,28 @@
       }
 
       .quote {
-        padding: 10px;
+        padding: 15px;
         background-color: #f9f9f9;
         margin-bottom: 10px;
         border-left: 4px solid #000;
         border-radius: 8px;
+
         color: #333;
         max-height: 80px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      @keyframes fadeInQuote {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
     </style>
   </head>
@@ -94,108 +123,142 @@
         <input type="text" id="keywordInput" placeholder="Enter a keyword..." />
         <button onclick="fetchSys()">Search</button>
       </div>
+
       <div id="quoteContainer">
         <div class="quote">
           <p>"Opportunities don't happen, you create them."</p>
           <p>- CHRIS GROSSER</p>
         </div>
         <div class="quote">
-          <p>"The only limit to our realization of tomorrow is our doubts of today."</p>
+          <p>
+            "The only limit to our realization of tomorrow is our doubts of
+            today."
+          </p>
           <p>- FRANKLIN D. ROOSEVELT</p>
         </div>
       </div>
     </div>
+  </body>
+  <script>
+    let resultsPresent = false;
+    let contChecking = false;
+    let SYS_URL = "https://api.datamuse.com/words?rel_syn=";
+    let API_URL = "https://api.quotable.io/search/quotes?query=";
+    let quoteContainer = document.getElementById("quoteContainer");
+    let keywordInput = document.getElementById("keywordInput");
+    function fetchSys() {
+      loadHTML = `
+        <div class="quote">
+        <p>SEARCHING FOR QUOTES....</p>
+      </div>
+        `;
+      quoteContainer.innerHTML = "";
+      quoteContainer.insertAdjacentHTML("beforeend", loadHTML);
+      fetch(SYS_URL + keywordInput.value)
+        .then((response) => response.json())
+        .then((data) => fetchQuotes(data))
+        .catch(() => {
+          sysERROR = `
+        <div class="quote">
+        <p>ERROR FETCHING QUOTE'S</p>
+      </div>
+        `;
+          quoteContainer.innerHTML = "";
+          quoteContainer.insertAdjacentHTML("beforeend", sysERROR);
+          console.log("Error fetching synonym's ");
+        });
+    }
 
-    <script>
-      let SYS_URL = "https://api.datamuse.com/words?rel_syn=";
-      let API_URL = "https://api.quotable.io/search/quotes?query=";
-      let quoteContainer = document.getElementById("quoteContainer");
-      let keywordInput = document.getElementById("keywordInput");
-      let resultsPresent = false;
-      let contChecking = false;
+    async function fetchQuotes(sysArray) {
 
-      function fetchSys() {
-        let keyword = keywordInput.value.trim();
-        if (!keyword) {
-          displayNoQuotes();
-          return;
-        }
 
-        quoteContainer.innerHTML = `<div class="quote"><p>SEARCHING FOR QUOTES....</p></div>`;
-        contChecking = true;
-        resultsPresent = false;
-        continueChecking();
-
-        fetch(SYS_URL + keyword)
-          .then(response => response.json())
-          .then(synonyms => fetchQuotes(synonyms))
-          .catch(() => {
-            displayError();
-          });
-      }
-
-      async function fetchQuotes(synonyms) {
-        let keyword = keywordInput.value.trim();
-        quoteContainer.innerHTML = "";
+      finalSys = sysArray;
+      let sysLength = finalSys.length;
+          quoteContainer.innerHTML = "";
+      await fetch(API_URL + keywordInput.value)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.results.length != 0) {
+            appendQuotes(data);
+            resultsPresent = true;
+          } else {
+            resultsPresent = false;
+          }
+        })
+        .catch(() => {
+          quoteERROR = `
+        <div class="quote">
+        <p>ERROR FETCHING QUOTE'S</p>
+      </div>
+        `;
         
-        await fetch(API_URL + keyword)
-          .then(response => response.json())
-          .then(data => {
-            if (data.results.length > 0) {
+          quoteContainer.innerHTML = "";
+          quoteContainer.insertAdjacentHTML("beforeend", quoteERROR);
+          console.log("Error fetching quotes ");
+        });
+        contChecking = true;
+      continueChecking();
+
+      for (let i = 0; i < sysLength; i++) {
+        let sys = finalSys[i].word;
+        fetch(API_URL + sys)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.results.length != 0) {
               appendQuotes(data);
               resultsPresent = true;
+            } else {
+              resultsPresent = false;
             }
           })
           .catch(() => {
-            console.log("Error fetching main quotes");
+            quoteERROR = `
+        <div class="quote">
+        <p>ERROR FETCHING QUOTE'S</p>
+      </div>
+        `;
+            quoteContainer.innerHTML = "";
+            quoteContainer.insertAdjacentHTML("beforeend", quoteERROR);
+            console.log("Error fetching quotes ");
           });
-
-        for (let syn of synonyms) {
-          await fetch(API_URL + syn.word)
-            .then(response => response.json())
-            .then(data => {
-              if (data.results.length > 0) {
-                appendQuotes(data);
-                resultsPresent = true;
-              }
-            })
-            .catch(() => {
-              console.log(`Error fetching quotes for ${syn.word}`);
-            });
-        }
-
-        contChecking = false;
       }
-
-      function appendQuotes(data) {
-        data.results.forEach(item => {
-          let quoteHTML = `
-            <div class="quote">
-              <p>"${item.content}"</p>
-              <p>- ${item.author.toUpperCase()}</p>
-            </div>
-          `;
+      contChecking = false;
+    }
+    function appendQuotes(quoteArray) {
+      finalQuote = quoteArray;
+      if (finalQuote.results.length != 0) {
+        let quoteLength = finalQuote.results.length;
+        for (let i = 0; i < quoteLength; i++) {
+          let quote = finalQuote.results[i].content;
+          let authorIni = finalQuote.results[i].authorSlug;
+          let space = " ";
+          let author = authorIni.replace("-", space).toUpperCase();
+          quoteHTML = `
+        <div class="quote">
+        <p>"${quote}"</p>
+        <p>- ${author}</p>
+      </div>
+        `;
           quoteContainer.insertAdjacentHTML("beforeend", quoteHTML);
-        });
-      }
-
-      function continueChecking() {
-        if (!resultsPresent && contChecking) {
-          setTimeout(() => {
-            if (!resultsPresent) {
-              displayNoQuotes();
-            }
-          }, 500);
         }
       }
-
-      function displayNoQuotes() {
-        quoteContainer.innerHTML = `<div class="quote"><p>NO QUOTES FOUND</p></div>`;
+    }
+    function continueChecking() {
+      if (resultsPresent == false) {
+        quoteERROR = `
+        <div class="quote">
+        <p>NO QUOTES FOUND</p>
+      </div>
+        `;
+        quoteContainer.innerHTML = "";
+        quoteContainer.insertAdjacentHTML("beforeend", quoteERROR);
       }
-
-      function displayError() {
-        quoteContainer.innerHTML = `<div class="quote"><p>ERROR FETCHING QUOTES</p></div>`;
+      if (contChecking) {
+         setTimeout(() => {
+        continueChecking;
+            
+          }, 500);
       }
-    </script>
-  </body>
+    }
+  </script>
 </html>
